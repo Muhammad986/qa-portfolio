@@ -23,3 +23,9 @@ class CheckBoxPageLocators:
     CHECKED_ITEMS = (By.XPATH, '//span[contains(@aria-checked, "true")]')
     TITLE_ITEM = (By.XPATH, "./..//span[contains(@class, 'rc-tree-title')]")
     OUTPUT_RESULT = (By.CSS_SELECTOR, 'span.text-success')
+
+class RadioButtonPageLocators:
+    YES_RADIO = (By.CSS_SELECTOR, 'label[for="yesRadio"]')
+    IMPRESSIVE_RADIO = (By.CSS_SELECTOR, 'label[for="impressiveRadio"]')
+    NO_RADIO = (By.CSS_SELECTOR, 'label[for="noRadio"]')
+    OUTPUT_RESULT = (By.CSS_SELECTOR, 'span.text-success')

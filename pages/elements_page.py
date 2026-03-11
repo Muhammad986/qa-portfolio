@@ -2,7 +2,7 @@ import random
 import re
 from typing import Iterable, Set
 
-from locators.elements_page_locators import CheckBoxPageLocators, TextBoxPageLocators
+from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators
 from pages.base_page import BasePage
 from generator.generator import generated_person
 
@@ -61,7 +61,7 @@ class CheckBoxPage(BasePage):
                 self.go_to_element(item)
                 self.driver.execute_script("arguments[0].click();", item)
 
-                #print(item.text)
+                
                 count -= 1
             else:
                 break
@@ -70,8 +70,8 @@ class CheckBoxPage(BasePage):
             r"[^a-z0-9а-яё]+", "",
             re.sub(r"\.[a-z0-9]+$", "", s.strip().lower())
         )
-        normalaze = [norm(s) for s in items]
-        return sorted(normalaze)
+        normalize = [norm(s) for s in items]
+        return sorted(normalize)
     
     def get_checked_checkboxes(self):
         checked_list = self.find_are_present(self.locators.CHECKED_ITEMS)
@@ -90,4 +90,22 @@ class CheckBoxPage(BasePage):
             data.append(item.text)
         data = self.normalize_text_items(data)
         return data
+    
+class RadioButtonPage(BasePage):
+    locators = RadioButtonPageLocators()
+
+    def click_on_the_radio_button(self, radio_button):
+        choices = {
+            'yes': self.locators.YES_RADIO,
+            'impressive': self.locators.IMPRESSIVE_RADIO,
+            'no': self.locators.NO_RADIO
+        }
+        if radio_button in choices:
+            self.find_is_visible(choices[radio_button]).click()
+        else:
+            raise ValueError(f"Invalid radio button choice: {radio_button}")
         
+
+    
+    def get_output_result(self):
+        return self.find_is_visible(self.locators.OUTPUT_RESULT).text 
