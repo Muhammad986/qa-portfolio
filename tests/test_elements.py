@@ -1,6 +1,8 @@
 import time
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage
+from faker.generator import random
+
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage
 
 class TestElements:
     """ class TestTextBox:
@@ -25,7 +27,7 @@ class TestElements:
             input_checkbox = check_box_page.get_checked_checkboxes()
             output_checkbox = check_box_page.get_output_result()
 
-            assert input_checkbox == output_checkbox, 'Checkboxes do not match' """
+            assert input_checkbox == output_checkbox, 'Checkboxes do not match'
 
     
     class TestRadioButton:
@@ -43,5 +45,25 @@ class TestElements:
             assert output_impressive == 'Impressive', 'IMPRESSIVE radio button is not selected'
             #assert output_no == '', 'NO radio button should not be selected'
 
-            print(f"YES: {output_yes}, IMPRESSIVE: {output_impressive}")
-            time.sleep(3)
+            print(f"YES: {output_yes}, IMPRESSIVE: {output_impressive}") """
+
+
+    class TestWebTable:
+        """ def test_web_table(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            new_person = web_table_page.add_new_person()
+            person_list = web_table_page.check_added_person()
+            print(f"\nAdded person: {new_person}")
+            print(f"Person list: {person_list}")
+            assert new_person in person_list, 'Added person is not in the table' """
+
+
+        def test_web_table_search_person(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            key_word = web_table_page.add_new_person()[random.randint(0, 5)]
+            web_table_page.search_some_person(key_word)
+            table_result = web_table_page.check_search_person()
+            assert key_word in table_result, 'Search result does not contain the key'
+            

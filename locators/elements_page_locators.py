@@ -29,3 +29,22 @@ class RadioButtonPageLocators:
     IMPRESSIVE_RADIO = (By.CSS_SELECTOR, 'label[for="impressiveRadio"]')
     NO_RADIO = (By.CSS_SELECTOR, 'label[for="noRadio"]')
     OUTPUT_RESULT = (By.CSS_SELECTOR, 'span.text-success')
+
+class WebTablePageLocators:
+    #Add person form
+    ADD_BUTTON = (By.CSS_SELECTOR, 'button[id="addNewRecordButton"]')
+    DELETE_BUTTON = (By.CSS_SELECTOR, 'span[title="Delete"]')
+
+    FIRST_NAME_INPUT = (By.CSS_SELECTOR, 'input[id="firstName"]')
+    LAST_NAME_INPUT = (By.CSS_SELECTOR, 'input[id="lastName"]')
+    EMAIL_INPUT = (By.CSS_SELECTOR, 'input[id="userEmail"]')
+    AGE_INPUT = (By.CSS_SELECTOR, 'input[id="age"]')
+    SALARY_INPUT = (By.CSS_SELECTOR, 'input[id="salary"]')
+    DEPARTMENT_INPUT = (By.CSS_SELECTOR, 'input[id="department"]')
+    SUBMIT_BUTTON = (By.CSS_SELECTOR, 'button[id="submit"]')
+
+    #Tables
+    FULL_PEOPLE_LIST = (By.CSS_SELECTOR, 'table.table tbody tr')
+    SEARCH_INPUT = (By.CSS_SELECTOR, 'input[id="searchBox"]')
+    DELETE_BUTTON = (By.CSS_SELECTOR, 'span[title="Delete"]')
+    ROW_PARENT = (By.XPATH, "./ancestor::tr")
