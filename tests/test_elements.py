@@ -49,14 +49,14 @@ class TestElements:
 
 
     class TestWebTable:
-        """ def test_web_table(self, driver):
+        """ def test_web_table_add_person(self, driver):
             web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
             web_table_page.open()
             new_person = web_table_page.add_new_person()
             person_list = web_table_page.check_added_person()
             print(f"\nAdded person: {new_person}")
             print(f"Person list: {person_list}")
-            assert new_person in person_list, 'Added person is not in the table' """
+            assert new_person in person_list, 'Added person is not in the table'
 
 
         def test_web_table_search_person(self, driver):
@@ -66,4 +66,31 @@ class TestElements:
             web_table_page.search_some_person(key_word)
             table_result = web_table_page.check_search_person()
             assert key_word in table_result, 'Search result does not contain the key'
+            
+
+        def test_web_table_update_person_info(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            search_key = web_table_page.add_new_person()[1]
+            web_table_page.search_some_person(search_key)
+            updated_field, updated_value = web_table_page.update_person_info()
+            row = web_table_page.check_search_person()
+            assert updated_value in row, f'{updated_field} was not updated correctly'
+
+        def test_web_table_delete_person(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            search_key = web_table_page.add_new_person()[1]
+            web_table_page.search_some_person(search_key)
+            web_table_page.delete_person()
+            row = web_table_page.check_search_person()
+            assert row == '', 'Person was not deleted successfully' """
+        
+        def test_web_table_change_count_row(self, driver):
+            web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
+            web_table_page.open()
+            count = web_table_page.select_up_to_some_rows()
+            expected_counts = [10, 20, 30, 40, 50]
+            assert count == expected_counts, f'Expected row counts {expected_counts}, but got {count}'
+
             

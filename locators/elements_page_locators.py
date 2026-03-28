@@ -48,3 +48,8 @@ class WebTablePageLocators:
     SEARCH_INPUT = (By.CSS_SELECTOR, 'input[id="searchBox"]')
     DELETE_BUTTON = (By.CSS_SELECTOR, 'span[title="Delete"]')
     ROW_PARENT = (By.XPATH, "./ancestor::tr")
+    COUNT_ROW_LIST = (By.CSS_SELECTOR, 'select[class="form-control"]')
+    COUNT_ACTIVE_ROW = (By.CSS_SELECTOR, 'select.form-control option:checked')
+
+    #Update person info
+    UPDATE_BUTTON = (By.CSS_SELECTOR, 'span[title="Edit"]')

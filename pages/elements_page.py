@@ -3,6 +3,8 @@ import re
 import time
 from typing import Iterable, Set
 
+from selenium.webdriver.common.by import By
+
 from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators
 from pages.base_page import BasePage
 from generator.generator import generated_person
@@ -149,8 +151,52 @@ class WebTablePage(BasePage):
         self.find_is_visible(self.locators.SEARCH_INPUT).send_keys(key)
 
     def check_search_person(self):
-        delete_buttons = self.find_are_present(self.locators.DELETE_BUTTON)
+        delete_buttons = self.driver.find_elements(*self.locators.DELETE_BUTTON)
         if not delete_buttons:
             return ""
         row = delete_buttons[0].find_element(*self.locators.ROW_PARENT)
         return row.text
+    
+    def update_person_info(self):
+        person_info = next(generated_person())
+        updatable_fields = {
+            "first_name": (self.locators.FIRST_NAME_INPUT, person_info.first_name),
+            "email": (self.locators.EMAIL_INPUT, person_info.email),
+            "age": (self.locators.AGE_INPUT, str(person_info.age)),
+            "salary": (self.locators.SALARY_INPUT, str(person_info.salary)),
+        }
+        field_name = random.choice(list(updatable_fields.keys()))
+        field_locator, new_value = updatable_fields[field_name]
+
+        self.find_is_visible(self.locators.UPDATE_BUTTON).click()
+        input_field = self.find_is_visible(field_locator)
+        input_field.clear()
+        input_field.send_keys(new_value)
+        self.find_is_visible(self.locators.SUBMIT_BUTTON).click()
+
+        return field_name, new_value
+    
+
+    def delete_person(self):
+        delete_buttons = self.driver.find_elements(*self.locators.DELETE_BUTTON)
+        if delete_buttons:
+            delete_buttons[0].click()
+
+    def select_up_to_some_rows(self):
+        count = [10, 20, 30, 40, 50]
+        data = []
+        for c in count:
+            count_row_button = self.find_is_visible(self.locators.COUNT_ROW_LIST)
+            self.go_to_element(count_row_button)
+            count_row_button.click()
+            self.find_is_visible((By.CSS_SELECTOR, f'option[value="{c}"]')).click()
+            data.append(self.check_count_rows())
+        return data
+
+    
+    def check_count_rows(self):
+        table_rows = self.find_is_visible(self.locators.COUNT_ACTIVE_ROW)
+        return int(table_rows.get_attribute('value'))
+
+            
+        
