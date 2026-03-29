@@ -5,7 +5,7 @@ from typing import Iterable, Set
 
 from selenium.webdriver.common.by import By
 
-from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators
+from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators, ButtonsPageLocators
 from pages.base_page import BasePage
 from generator.generator import generated_person
 
@@ -198,5 +198,20 @@ class WebTablePage(BasePage):
         table_rows = self.find_is_visible(self.locators.COUNT_ACTIVE_ROW)
         return int(table_rows.get_attribute('value'))
 
-            
+
+class ButtonsPage(BasePage):
+    locators = ButtonsPageLocators()
+
+    def click_on_the_button(self):
+        self.find_is_visible(self.locators.CLICK_ME_BUTTON).click()
+        return self.find_is_present(self.locators.CLICK_ME_MESSAGE).text
+    
+    def double_click_on_the_button(self):
+        self.action_double_click(self.find_is_visible(self.locators.DOUBLE_CLICK_BUTTON))
+        return self.find_is_present(self.locators.DOUBLE_CLICK_MESSAGE).text
+    
+    def right_click_on_the_button(self):
+        self.action_right_click(self.find_is_visible(self.locators.RIGHT_CLICK_BUTTON))
+        return self.find_is_present(self.locators.RIGHT_CLICK_MESSAGE).text
+
         

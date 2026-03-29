@@ -2,7 +2,7 @@ import time
 
 from faker.generator import random
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage
 
 class TestElements:
     """ class TestTextBox:
@@ -45,11 +45,11 @@ class TestElements:
             assert output_impressive == 'Impressive', 'IMPRESSIVE radio button is not selected'
             #assert output_no == '', 'NO radio button should not be selected'
 
-            print(f"YES: {output_yes}, IMPRESSIVE: {output_impressive}") """
+            print(f"YES: {output_yes}, IMPRESSIVE: {output_impressive}")
 
 
     class TestWebTable:
-        """ def test_web_table_add_person(self, driver):
+        def test_web_table_add_person(self, driver):
             web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
             web_table_page.open()
             new_person = web_table_page.add_new_person()
@@ -84,13 +84,25 @@ class TestElements:
             web_table_page.search_some_person(search_key)
             web_table_page.delete_person()
             row = web_table_page.check_search_person()
-            assert row == '', 'Person was not deleted successfully' """
+            assert row == '', 'Person was not deleted successfully'
         
         def test_web_table_change_count_row(self, driver):
             web_table_page = WebTablePage(driver, 'https://demoqa.com/webtables')
             web_table_page.open()
             count = web_table_page.select_up_to_some_rows()
             expected_counts = [10, 20, 30, 40, 50]
-            assert count == expected_counts, f'Expected row counts {expected_counts}, but got {count}'
+            assert count == expected_counts, f'Expected row counts {expected_counts}, but got {count}' """
+    
+    class TestButtonsPage:
+        def test_different_on_the_buttons(self, driver):
+            buttons_page = ButtonsPage(driver, 'https://demoqa.com/buttons')
+            buttons_page.open()
+            double_click_result = buttons_page.double_click_on_the_button()
+            right_click_result = buttons_page.right_click_on_the_button()
+            click_result = buttons_page.click_on_the_button()
+
+            assert double_click_result == 'You have done a double click', 'Double click result is incorrect'
+            assert right_click_result == 'You have done a right click', 'Right click result is incorrect'
+            assert click_result == 'You have done a dynamic click', 'Click result is incorrect'
 
             
