@@ -2,7 +2,7 @@ import time
 
 from faker.generator import random
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage
 
 class TestElements:
     """ class TestTextBox:
@@ -91,7 +91,7 @@ class TestElements:
             web_table_page.open()
             count = web_table_page.select_up_to_some_rows()
             expected_counts = [10, 20, 30, 40, 50]
-            assert count == expected_counts, f'Expected row counts {expected_counts}, but got {count}' """
+            assert count == expected_counts, f'Expected row counts {expected_counts}, but got {count}'
     
     class TestButtonsPage:
         def test_different_on_the_buttons(self, driver):
@@ -103,6 +103,18 @@ class TestElements:
 
             assert double_click_result == 'You have done a double click', 'Double click result is incorrect'
             assert right_click_result == 'You have done a right click', 'Right click result is incorrect'
-            assert click_result == 'You have done a dynamic click', 'Click result is incorrect'
+            assert click_result == 'You have done a dynamic click', 'Click result is incorrect' """
 
+    class TestLinksPage:
+        def test_check_links(self, driver):
+            links_page = LinksPage(driver, 'https://demoqa.com/links')
+            links_page.open()
+            href_link, current_url = links_page.check_new_tab_simple_link()
+            assert href_link == current_url, 'The link did not open in a new tab or the URL is incorrect'
+            
+        def test_broken_list(self, driver):
+            links_page = LinksPage(driver, 'https://demoqa.com/links')
+            links_page.open()
+            broken_link_status = links_page.check_broken_link('https://demoqa.com/bad-request')
+            assert broken_link_status == '400', f'Broken link with status code: {broken_link_status}'
             

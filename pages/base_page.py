@@ -36,5 +36,4 @@ class BasePage:
 
     def action_right_click(self, element):
         ActionChains(self.driver).context_click(element).perform()
-
         
