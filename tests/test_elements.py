@@ -3,7 +3,7 @@ import time
 
 from faker.generator import random
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage, UploadAndDownloadPage
+from pages.elements_page import DynamicPropertiesPage, TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage, UploadAndDownloadPage
 
 class TestElements:
     """ class TestTextBox:
@@ -117,7 +117,7 @@ class TestElements:
             links_page = LinksPage(driver, 'https://demoqa.com/links')
             links_page.open()
             broken_link_status = links_page.check_broken_link('https://demoqa.com/bad-request')
-            assert broken_link_status == '400', f'Broken link with status code: {broken_link_status}' """
+            assert broken_link_status == '400', f'Broken link with status code: {broken_link_status}'
             
     class TestUploadAndDownload:
         def test_upload_file(self, driver):
@@ -141,5 +141,17 @@ class TestElements:
                 assert file_size > 0, 'Downloaded file is empty'
                 assert file_name.endswith(".jpeg"), 'Downloaded file does not have the expected .jpeg extension'
             finally:
-                upload_download_page.delete_downloaded_file(file_path)
+                upload_download_page.delete_downloaded_file(file_path) """
 
+    class TestDynamicProperties:
+        def test_dynamic_properties(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, 'https://demoqa.com/dynamic-properties')
+            dynamic_properties_page.open()
+            color_before, color_after = dynamic_properties_page.check_color_change()
+            assert color_before != color_after, 'Button color did not change after 5 seconds'
+        def test_appear_button(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, 'https://demoqa.com/dynamic-properties')
+            dynamic_properties_page.open()
+            is_button_appeared = dynamic_properties_page.check_appear_button()
+            print(f"Is the button appeared: {is_button_appeared}")
+            assert is_button_appeared, 'Button did not appear after 5 seconds'

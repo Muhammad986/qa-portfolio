@@ -7,10 +7,11 @@ import time
 from typing import Iterable, Set
 from pathlib import Path, PureWindowsPath
 
+from selenium.common import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 
-from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators
+from locators.elements_page_locators import CheckBoxPageLocators, DynamicPropertiesLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators
 from pages.base_page import BasePage
 from generator.generator import generated_file, generated_person
 
@@ -300,3 +301,34 @@ class UploadAndDownloadPage(BasePage):
     def delete_downloaded_file(self, file_path):
         if os.path.exists(file_path):
             os.remove(file_path)
+
+class DynamicPropertiesPage(BasePage):
+    locators = DynamicPropertiesLocators()
+
+    def check_color_change(self, timeout=10):
+        button = self.find_is_visible(self.locators.COLOR_CHANGE_BUTTON)
+        color_before = button.value_of_css_property('color')
+
+        WebDriverWait(self.driver, timeout).until(
+            lambda driver: self.find_is_visible(self.locators.COLOR_CHANGE_BUTTON)
+            .value_of_css_property('color') != color_before,
+            message=f"Цвет кнопки не изменился за {timeout} секунд"
+        )
+
+        color_after = self.find_is_visible(self.locators.COLOR_CHANGE_BUTTON).value_of_css_property('color')
+        return color_before, color_after
+
+    def check_appear_button(self):
+        try:
+            self.find_is_visible(self.locators.VISIBLE_AFTER_BUTTON)
+        except TimeoutException:
+            return False
+        return True
+    
+    def enable_button(self):
+        try:
+            button = self.find_is_visible(self.locators.ENABLE_BUTTON)
+            return button.is_enabled()
+        except TimeoutException:
+            return False
+    
