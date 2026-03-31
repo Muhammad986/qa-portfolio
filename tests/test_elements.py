@@ -155,3 +155,9 @@ class TestElements:
             is_button_appeared = dynamic_properties_page.check_appear_button()
             print(f"Is the button appeared: {is_button_appeared}")
             assert is_button_appeared, 'Button did not appear after 5 seconds'
+
+        def test_enable_button(self, driver):
+            dynamic_properties_page = DynamicPropertiesPage(driver, 'https://demoqa.com/dynamic-properties')
+            dynamic_properties_page.open()
+            is_button_enabled = dynamic_properties_page.enable_button()
+            assert is_button_enabled, 'Button did not become enabled after 5 seconds'
