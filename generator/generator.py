@@ -1,5 +1,7 @@
 from data.data import Person
 from faker import Faker
+from pathlib import Path
+import random
 
 faker_ru = Faker('ru_RU')
 Faker.seed()
@@ -16,3 +18,10 @@ def generated_person():
         current_address=faker_ru.address(),
         permanent_address=faker_ru.address()
     )
+
+def generated_file():
+    path = f'/home/muhammad/Dev/qa-portfolio/file_for_tests/test_file{random.randint(0, 999)}.txt'
+    file = open(path, 'w+')
+    file.write(f'Hello, this is a test file. Random number: {random.randint(0, 999)}')
+    file.close()
+    return Path(path).name, path

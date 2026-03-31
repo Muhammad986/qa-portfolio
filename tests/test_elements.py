@@ -1,8 +1,9 @@
+import os
 import time
 
 from faker.generator import random
 
-from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage
+from pages.elements_page import TextBoxPage, CheckBoxPage, RadioButtonPage, WebTablePage, ButtonsPage, LinksPage, UploadAndDownloadPage
 
 class TestElements:
     """ class TestTextBox:
@@ -103,7 +104,7 @@ class TestElements:
 
             assert double_click_result == 'You have done a double click', 'Double click result is incorrect'
             assert right_click_result == 'You have done a right click', 'Right click result is incorrect'
-            assert click_result == 'You have done a dynamic click', 'Click result is incorrect' """
+            assert click_result == 'You have done a dynamic click', 'Click result is incorrect'
 
     class TestLinksPage:
         def test_check_links(self, driver):
@@ -116,5 +117,29 @@ class TestElements:
             links_page = LinksPage(driver, 'https://demoqa.com/links')
             links_page.open()
             broken_link_status = links_page.check_broken_link('https://demoqa.com/bad-request')
-            assert broken_link_status == '400', f'Broken link with status code: {broken_link_status}'
+            assert broken_link_status == '400', f'Broken link with status code: {broken_link_status}' """
             
+    class TestUploadAndDownload:
+        def test_upload_file(self, driver):
+            upload_download_page = UploadAndDownloadPage(driver, 'https://demoqa.com/upload-download')
+            upload_download_page.open()
+            file_name, uploaded_file_path = upload_download_page.upload_file()
+            assert file_name == uploaded_file_path, 'Uploaded file name does not match the expected file name'
+
+        def test_download_file(self, driver):
+            upload_download_page = UploadAndDownloadPage(driver, 'https://demoqa.com/upload-download')
+            upload_download_page.open()
+
+            file_path, file_name, file_size = upload_download_page.download_file()
+            print(f"Downloaded file path: {file_path}")
+            print(f"Downloaded file name: {file_name}")
+            print(f"Downloaded file size: {file_size}")
+
+
+            try:
+                assert os.path.exists(file_path), 'Downloaded file does not exist'
+                assert file_size > 0, 'Downloaded file is empty'
+                assert file_name.endswith(".jpeg"), 'Downloaded file does not have the expected .jpeg extension'
+            finally:
+                upload_download_page.delete_downloaded_file(file_path)
+

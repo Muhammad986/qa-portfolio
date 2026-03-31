@@ -1,14 +1,18 @@
+#import base64, uuid
+import os
 import random
 import re
 import requests
 import time
 from typing import Iterable, Set
+from pathlib import Path, PureWindowsPath
 
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 
-from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators, ButtonsPageLocators, LinksPageLocators
+from locators.elements_page_locators import CheckBoxPageLocators, RadioButtonPageLocators, TextBoxPageLocators, WebTablePageLocators, ButtonsPageLocators, LinksPageLocators, UploadAndDownloadPageLocators
 from pages.base_page import BasePage
-from generator.generator import generated_person
+from generator.generator import generated_file, generated_person
 
 
 class TextBoxPage(BasePage):
@@ -238,4 +242,61 @@ class LinksPage(BasePage):
         else:
             return str(request.status_code)
             
-        
+class UploadAndDownloadPage(BasePage):
+    locators = UploadAndDownloadPageLocators()
+    def upload_file(self):
+        file_name, path = generated_file()
+        self.find_is_visible(self.locators.UPLOAD_FILE_INPUT).send_keys(path)
+        uploaded_file_path = self.find_is_visible(self.locators.UPLOAD_FILE_PATH).text.split("\\")[-1].strip()
+        #uploaded_file_path = PureWindowsPath(self.find_is_visible(self.locators.UPLOAD_FILE_PATH).text).name
+        os.remove(path)
+        print(f"Uploaded file name: {file_name}, Uploaded file path: {uploaded_file_path}")
+        return file_name, uploaded_file_path
+
+
+    #def download_file(self):
+    #    href = self.find_is_present(self.locators.DOWNLOAD_BUTTON).get_attribute('href')
+    #    if 'base64,' not in href:
+    #        raise ValueError("В href нет base64-данных")
+    #    base64_data = href.split('base64,', 1)[1]
+    #    file_bytes = base64.b64decode(base64_data)
+    #    file_name = f"test_file_{uuid.uuid4().hex}.jpg"
+    #    file_path = os.path.join('/home/muhammad/Dev/qa-portfolio/file_for_tests', file_name)
+    #    with open(file_path, 'wb') as file:
+    #        file.write(file_bytes)
+    #    file_size = os.path.getsize(file_path)
+    #    if file_size == 0:
+    #        raise AssertionError("Скачанный файл пустой")
+    #    return file_path, file_name, file_size
+
+
+    def download_file(self, timeout=10):
+        download_dir = Path("file_for_tests").resolve()
+        download_dir.mkdir(parents=True, exist_ok=True)
+        before_files = {file.name for file in download_dir.iterdir()}
+
+        self.find_is_visible(self.locators.DOWNLOAD_BUTTON).click()
+
+        file_path = WebDriverWait(self.driver, timeout, poll_frequency=0.5).until(
+            lambda _: next(
+                (
+                    file for file in download_dir.iterdir()
+                    if file.name not in before_files
+                    and file.is_file()
+                    and file.suffix != ".crdownload"
+                ),
+                False
+            ),
+            message="Файл не был скачан за отведённое время"
+        )
+
+        file_size = file_path.stat().st_size
+        if file_size == 0:
+            raise AssertionError("Скачанный файл пустой")
+
+        return str(file_path), file_path.name, file_size
+    
+
+    def delete_downloaded_file(self, file_path):
+        if os.path.exists(file_path):
+            os.remove(file_path)
