@@ -1,6 +1,6 @@
 from faker.generator import random
 
-from locators.alert_frame_windows_locators import AlertsPageLocators, BrowserWindowsPageLocators, FramesPageLocators, NestedFramesPageLocators
+from locators.alert_frame_windows_locators import AlertsPageLocators, BrowserWindowsPageLocators, FramesPageLocators, ModalDialogsPageLocators, NestedFramesPageLocators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -71,3 +71,19 @@ class NestedFramesPage(BasePage):
             switch_back="default"
             )
         return parent_frame, child_frame
+
+class ModalDialogsPage(BasePage):
+    locators = ModalDialogsPageLocators()
+    def check_small_modal_dialog(self):
+        self.find_is_clickable(self.locators.SMALL_MODAL_BUTTON).click()
+        title = self.find_is_present(self.locators.TITLE_MODAL).text
+        text_body = self.find_is_present(self.locators.TEXT_MODAL).text
+        self.find_is_clickable(self.locators.CLOSE_SMALL_MODAL_BUTTON).click()
+        return [title, len(text_body)]
+
+    def check_large_modal_dialog(self):
+        self.find_is_clickable(self.locators.LARGE_MODAL_BUTTON).click()
+        title = self.find_is_present(self.locators.TITLE_MODAL).text
+        text_body = self.find_is_present(self.locators.TEXT_MODAL).text
+        self.find_is_clickable(self.locators.CLOSE_LARGE_MODAL_BUTTON).click()
+        return [title, len(text_body)]
