@@ -37,4 +37,19 @@ class BasePage:
 
     def action_right_click(self, element):
         ActionChains(self.driver).context_click(element).perform()
-        
+
+    def click_and_switch_to_new_window(self, locator, timeout=10):
+        old_handles = set(self.driver.window_handles)
+        parent_handle = self.driver.current_window_handle
+    
+        self.find_is_clickable(locator, timeout).click()
+    
+        wait(self.driver, timeout).until(
+            lambda driver: len(set(driver.window_handles) - old_handles) > 0
+        )
+    
+        new_handle = (set(self.driver.window_handles) - old_handles).pop()
+        self.driver.switch_to.window(new_handle)
+    
+        return parent_handle, new_handle
+    
