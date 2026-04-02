@@ -53,3 +53,23 @@ class BasePage:
     
         return parent_handle, new_handle
     
+
+    def click_and_handle_alert(self, locator, timeout=10, action="accept", input_text=None):
+        self.find_is_clickable(locator, timeout).click()
+    
+        alert = wait(self.driver, timeout).until(EC.alert_is_present())
+        alert_text = alert.text
+    
+        if input_text is not None:
+            alert.send_keys(input_text)
+    
+        if action == "accept":
+            alert.accept()
+        elif action == "dismiss":
+            alert.dismiss()
+        else:
+            raise ValueError(f"Unsupported alert action: {action}")
+    
+        return alert_text
+    
+    
