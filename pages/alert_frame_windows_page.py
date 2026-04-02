@@ -1,6 +1,6 @@
 from faker.generator import random
 
-from locators.alert_frame_windows_locators import AlertsPageLocators, BrowserWindowsPageLocators
+from locators.alert_frame_windows_locators import AlertsPageLocators, BrowserWindowsPageLocators, FramesPageLocators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -16,7 +16,7 @@ class BrowserWindowsPage(BasePage):
         self.click_and_switch_to_new_window(self.locators.NEW_WINDOW_BUTTON)
         return self.find_is_present(self.locators.TEXT_NEW_WINDOW).text
     
-class TestAlertsPage(BasePage):
+class AlertsPage(BasePage):
     locators = AlertsPageLocators()
     def check_see_alert(self):
         return self.click_and_handle_alert(self.locators.SEE_ALERT_BUTTON)
@@ -43,3 +43,16 @@ class TestAlertsPage(BasePage):
             input_text=input_text
         )
         return self.find_is_visible(self.locators.PROMPT_RESULT).text
+
+class FramesPage(BasePage):
+    locators = FramesPageLocators()
+    def check_frames(self, frame_number):
+        frames = {
+            "frame_1": self.locators.FRAME_1,
+            "frame_2": self.locators.FRAME_2,
+        }
+    
+        if frame_number not in frames:
+            raise ValueError(f"Unknown frame: {frame_number}")
+    
+        return self.get_frame_data(frames[frame_number], self.locators.TEXT_FRAME)

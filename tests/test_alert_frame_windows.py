@@ -1,7 +1,7 @@
 
 import time
 
-from pages.alert_frame_windows_page import BrowserWindowsPage, TestAlertsPage
+from pages.alert_frame_windows_page import BrowserWindowsPage, AlertsPage, FramesPage
 
 
 class TestAlertFrameWindows:    
@@ -22,19 +22,19 @@ class TestAlertFrameWindows:
 
     class TestAlertsPage:
         def test_see_alert(self, driver):
-            browser_windows_page = TestAlertsPage(driver, 'https://demoqa.com/alerts')
+            browser_windows_page = AlertsPage(driver, 'https://demoqa.com/alerts')
             browser_windows_page.open()
             alert_text = browser_windows_page.check_see_alert()
             assert alert_text == 'You clicked a button', "Alert text does not match expected value"
 
         def test_see_alert_after_5_sec(self, driver):
-            browser_windows_page = TestAlertsPage(driver, 'https://demoqa.com/alerts')
+            browser_windows_page = AlertsPage(driver, 'https://demoqa.com/alerts')
             browser_windows_page.open()
             alert_text = browser_windows_page.check_see_alert_after_5_sec()
             assert alert_text == 'This alert appeared after 5 seconds', "Alert text does not match expected value"
 
         def test_confirm_box_alert(self, driver):
-            browser_windows_page = TestAlertsPage(driver, 'https://demoqa.com/alerts')
+            browser_windows_page = AlertsPage(driver, 'https://demoqa.com/alerts')
             browser_windows_page.open()
             text_result = browser_windows_page.check_confirm_box_alert()
             print(text_result)
@@ -42,7 +42,15 @@ class TestAlertFrameWindows:
 
         def test_prompt_box_alert(self, driver):
             input_text = 'Soska'
-            browser_windows_page = TestAlertsPage(driver, 'https://demoqa.com/alerts')
+            browser_windows_page = AlertsPage(driver, 'https://demoqa.com/alerts')
             browser_windows_page.open()
             text_result = browser_windows_page.check_prompt_box_alert(input_text)
             assert text_result == f'You entered {input_text}', "Prompt result text does not match expected value"
+
+    class TestFramesPage:
+        def test_frames(self, driver):
+            browser_windows_page = FramesPage(driver, 'https://demoqa.com/frames')
+            browser_windows_page.open()
+            result_frame_1 = browser_windows_page.check_frames('frame_1')
+            result_frame_2 = browser_windows_page.check_frames('frame_2')
+            assert result_frame_1 == ['This is a sample page', '500px', '350px'] and result_frame_2 == ['This is a sample page', '100px', '100px'], "Frame text or dimensions do not match expected values"
