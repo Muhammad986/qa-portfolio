@@ -72,16 +72,25 @@ class BasePage:
     
         return alert_text
     
-    def get_frame_data(self, frame_locator, text_locator):
+    def get_frame_data(self, frame_locator, text_locator, switch_back="default"):
         frame = self.find_is_present(frame_locator)
-        width = frame.get_attribute("width")
-        height = frame.get_attribute("height")
-    
-        try:
-            self.driver.switch_to.frame(frame)
-            text = self.find_is_visible(text_locator).text
-        finally:
+        width = frame.value_of_css_property("width")
+        height = frame.value_of_css_property("height")
+
+
+
+        self.driver.switch_to.frame(frame)
+        text = self.find_is_visible(text_locator).text
+
+        if switch_back == "default":
             self.driver.switch_to.default_content()
-    
+        elif switch_back == "parent":
+            self.driver.switch_to.parent_frame()
+        elif switch_back is None:
+            pass
+        else:
+            raise ValueError(f"Unsupported switch_back value: {switch_back}")
+
         return [text, width, height]
+
     

@@ -1,7 +1,7 @@
 
 import time
 
-from pages.alert_frame_windows_page import BrowserWindowsPage, AlertsPage, FramesPage
+from pages.alert_frame_windows_page import BrowserWindowsPage, AlertsPage, FramesPage, NestedFramesPage
 
 
 class TestAlertFrameWindows:    
@@ -49,8 +49,16 @@ class TestAlertFrameWindows:
 
     class TestFramesPage:
         def test_frames(self, driver):
-            browser_windows_page = FramesPage(driver, 'https://demoqa.com/frames')
-            browser_windows_page.open()
-            result_frame_1 = browser_windows_page.check_frames('frame_1')
-            result_frame_2 = browser_windows_page.check_frames('frame_2')
+            frames_page = FramesPage(driver, 'https://demoqa.com/frames')
+            frames_page.open()
+            result_frame_1 = frames_page.check_frames('frame_1')
+            result_frame_2 = frames_page.check_frames('frame_2')
             assert result_frame_1 == ['This is a sample page', '500px', '350px'] and result_frame_2 == ['This is a sample page', '100px', '100px'], "Frame text or dimensions do not match expected values"
+
+    class TestNestedFramesPage:
+        def test_nested_frames(self, driver):
+            nested_frames_page = NestedFramesPage(driver, 'https://demoqa.com/nestedframes')
+            nested_frames_page.open()
+            nested_frames_page.check_nested_frames()
+            parent_frame, child_frame = nested_frames_page.check_nested_frames()
+            assert parent_frame == ['Parent frame', '500px', '350px'] and child_frame == ['Child Iframe', '300px', '150px'], "Nested frame texts do not match expected values"

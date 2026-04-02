@@ -1,6 +1,6 @@
 from faker.generator import random
 
-from locators.alert_frame_windows_locators import AlertsPageLocators, BrowserWindowsPageLocators, FramesPageLocators
+from locators.alert_frame_windows_locators import AlertsPageLocators, BrowserWindowsPageLocators, FramesPageLocators, NestedFramesPageLocators
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -56,3 +56,18 @@ class FramesPage(BasePage):
             raise ValueError(f"Unknown frame: {frame_number}")
     
         return self.get_frame_data(frames[frame_number], self.locators.TEXT_FRAME)
+    
+class NestedFramesPage(BasePage):
+    locators = NestedFramesPageLocators() 
+    def check_nested_frames(self):
+        parent_frame = self.get_frame_data(
+            self.locators.PARENT_FRAME, 
+            self.locators.TEXT_PARENT_FRAME, 
+            switch_back=None
+            )
+        child_frame = self.get_frame_data(
+            self.locators.CHILD_FRAME,
+            self.locators.TEXT_CHILD_FRAME,
+            switch_back="default"
+            )
+        return parent_frame, child_frame
