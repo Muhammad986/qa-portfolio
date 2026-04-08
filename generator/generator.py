@@ -1,5 +1,5 @@
 
-from data.data import Person
+from data.data import Color, Person
 from faker import Faker
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -52,3 +52,10 @@ def generate_random_date(start_year=1980, end_year=2005):
     random_date = start_date + timedelta(days=random_days)
     
     return random_date.strftime("%d %b %Y")
+
+def generated_color():
+    yield Color(
+        color_name=[
+            "Red", "Blue", "Green", "Yellow", "Purple", "Black", "White","Voilet", "Indigo", "Magenta", "Aqua"
+        ]
+    )
