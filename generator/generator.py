@@ -1,11 +1,12 @@
 
-from data.data import Color, Person
+from data.data import Color, Date, Person
 from faker import Faker
 from pathlib import Path
 from datetime import datetime, timedelta
 import random
 
 faker_ru = Faker('ru_RU')
+faker_en = Faker('en_US')
 Faker.seed()
 
 def generated_person():
@@ -58,4 +59,11 @@ def generated_color():
         color_name=[
             "Red", "Blue", "Green", "Yellow", "Purple", "Black", "White","Voilet", "Indigo", "Magenta", "Aqua"
         ]
+    )
+def generated_date():
+    yield Date(
+        date=faker_en.day_of_month(),
+        month=faker_en.month_name(),
+        year=faker_en.year(),
+        time='12:00'
     )
