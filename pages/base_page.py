@@ -38,6 +38,10 @@ class BasePage:
     def action_right_click(self, element):
         ActionChains(self.driver).context_click(element).perform()
 
+    def action_drag_and_drop(self, element, x_coordinate, y_coordinate):
+        action = ActionChains(self.driver)
+        action.drag_and_drop_by_offset(element, x_coordinate, y_coordinate).perform()
+
     def click_and_switch_to_new_window(self, locator, timeout=10):
         old_handles = set(self.driver.window_handles)
         parent_handle = self.driver.current_window_handle

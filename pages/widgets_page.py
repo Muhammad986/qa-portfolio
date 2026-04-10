@@ -7,7 +7,7 @@ from selenium.webdriver.support.select import Select
 
 
 from generator.generator import generated_color, generated_date
-from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators
+from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, ProgressBarPageLocators, SliderPageLocators
 from pages.base_page import BasePage
 
 
@@ -121,3 +121,24 @@ class DatePickerPage(BasePage):
             if item.text == value:
                 item.click()
                 break
+
+class SliderPage(BasePage):
+    locators = SliderPageLocators()
+
+    def chenge_slider_value(self):
+        value_before = self.find_is_visible(self.locators.SLIDER_VALUE).get_attribute('value')
+        slider = self.find_is_visible(self.locators.INPUT_SLIDER)
+        self.action_drag_and_drop(slider, x_coordinate=random.randint(0, 100), y_coordinate=0)
+        value_after = self.find_is_visible(self.locators.SLIDER_VALUE).get_attribute('value')
+        return value_before, value_after
+
+class ProgressBarPage(BasePage):
+    locators = ProgressBarPageLocators() 
+    def chenge_progress_bar_value(self):
+        value_before = self.find_is_present(self.locators.PROGRESS_BAR_VALUE).get_attribute('aria-valuenow')
+        progress_bar_button = self.find_is_clickable(self.locators.PROGRESS_BAR_BUTTON)
+        progress_bar_button.click()
+        time.sleep(random.randint(2, 5))
+        progress_bar_button.click()
+        value_after = self.find_is_present(self.locators.PROGRESS_BAR_VALUE).get_attribute('aria-valuenow')
+        return value_before, value_after
