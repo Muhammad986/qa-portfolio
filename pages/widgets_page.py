@@ -4,10 +4,12 @@ from faker.generator import random
 from selenium.common import TimeoutException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait as wait
 
 
 from generator.generator import generated_color, generated_date
-from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, ProgressBarPageLocators, SliderPageLocators, TabsPageLocators
+from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, ProgressBarPageLocators, SliderPageLocators, TabsPageLocators, ToolTipsPageLocators
 from pages.base_page import BasePage
 
 
@@ -169,3 +171,42 @@ class TabsPage(BasePage):
         tab_button.click()
         tab_content = self.find_is_visible(tabs[tabs_n]['content'])
         return tab_button.text, len(tab_content.text)
+    
+class ToolTipsPage(BasePage):
+    locators = ToolTipsPageLocators()
+
+    def get_text_from_tool_tips(self, hover_elem, timeout=5):
+        element = self.find_is_present(hover_elem, timeout)
+        self.go_to_element(element)
+        element = self.find_is_visible_no_scroll(hover_elem, timeout)
+
+        self.action_move_to_element(element)
+        #Дублируем hover через JS. Это страховка от нестабильного ActionChains
+        self.driver.execute_script(
+            "arguments[0].dispatchEvent(new MouseEvent('mouseover', {bubbles: true}));",
+            element
+        )
+
+        tooltip_id = wait(self.driver, timeout).until(
+            lambda driver: element.get_attribute("aria-describedby") or False
+        )
+
+        tooltip_locator = (By.CSS_SELECTOR, f'div[id="{tooltip_id}"] .tooltip-inner')
+
+        return wait(self.driver, timeout).until(
+            lambda driver: driver.find_element(*tooltip_locator).text.strip() or False
+        )
+
+    def check_tool_tips(self):
+        tool_tip_text_button = self.get_text_from_tool_tips(self.locators.BUTTON)
+        tool_tip_text_field = self.get_text_from_tool_tips(self.locators.FIELD)
+        tool_tip_text_contrary = self.get_text_from_tool_tips(self.locators.CONTRARY_LINK)
+        tool_tip_text_section = self.get_text_from_tool_tips(self.locators.SECTION_LINK)
+
+        return (
+            tool_tip_text_button,
+            tool_tip_text_field,
+            tool_tip_text_contrary,
+            tool_tip_text_section
+        )
+

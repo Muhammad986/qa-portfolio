@@ -14,6 +14,11 @@ class BasePage:
         self.go_to_element(self.driver.find_element(*locator))
         return wait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
     
+    def find_is_visible_no_scroll(self, locator, timeout=5):
+        return wait(self.driver, timeout).until(EC.visibility_of_element_located(locator))
+    
+    def find_is_invisible(self, locator, timeout=5):
+        return wait(self.driver, timeout).until(EC.invisibility_of_element_located(locator))
     def find_are_visible(self, locator, timeout=5):
         return wait(self.driver, timeout).until(EC.visibility_of_all_elements_located(locator))
     
@@ -41,6 +46,10 @@ class BasePage:
     def action_drag_and_drop(self, element, x_coordinate, y_coordinate):
         action = ActionChains(self.driver)
         action.drag_and_drop_by_offset(element, x_coordinate, y_coordinate).perform()
+
+    def action_move_to_element(self, element):
+        action = ActionChains(self.driver)
+        action.move_to_element(element).perform()
 
     def click_and_switch_to_new_window(self, locator, timeout=10):
         old_handles = set(self.driver.window_handles)
