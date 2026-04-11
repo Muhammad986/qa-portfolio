@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 
 
 from generator.generator import generated_color, generated_date
-from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, ProgressBarPageLocators, SliderPageLocators, TabsPageLocators, ToolTipsPageLocators
+from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, MenuPageLocators, ProgressBarPageLocators, SliderPageLocators, TabsPageLocators, ToolTipsPageLocators
 from pages.base_page import BasePage
 
 
@@ -209,4 +209,16 @@ class ToolTipsPage(BasePage):
             tool_tip_text_contrary,
             tool_tip_text_section
         )
+    
+class MenuPage(BasePage):
+    locators = MenuPageLocators()
+
+    def check_menu(self):
+        menu_item_list = self.find_are_present(self.locators.MENU_ITEM_LIST)
+        data = []
+        
+        for item in menu_item_list:
+            self.action_move_to_element(item)
+            data.append(item.text)
+        return data
 
