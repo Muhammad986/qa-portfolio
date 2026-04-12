@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait as wait
 
 
 from generator.generator import generated_color, generated_date
-from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, MenuPageLocators, ProgressBarPageLocators, SliderPageLocators, TabsPageLocators, ToolTipsPageLocators
+from locators.widgets_locators import AccordianPageLocators, AutoCompleteLocators, DatePickerPageLocators, MenuPageLocators, ProgressBarPageLocators, SelectMenuPageLocators, SliderPageLocators, TabsPageLocators, ToolTipsPageLocators
 from pages.base_page import BasePage
 
 
@@ -221,4 +221,107 @@ class MenuPage(BasePage):
             self.action_move_to_element(item)
             data.append(item.text)
         return data
+    
 
+class SelectMenuPage(BasePage):
+    locators = SelectMenuPageLocators()
+
+    SELECT_VALUE_OPTIONS = [
+        "Group 1, option 1",
+        "Group 1, option 2",
+        "Group 2, option 1",
+        "Group 2, option 2",
+        "A root option"
+    ]
+    SELECT_ONE_OPTIONS = ["Dr.", "Mr.", "Mrs.", "Ms.", "Prof.", "Other"]
+    MULTISELECT_OPTIONS = ["Red", "Blue", "Green", "Black"]
+
+    def open_react_select(self, container_locator, timeout=5):
+        container = self.find_is_clickable(container_locator, timeout)
+        self.go_to_element(container)
+
+        try:
+            container.click()
+        except Exception:
+            self.driver.execute_script("arguments[0].click();", container)
+
+    def select_react_option(self, container_locator, input_locator, value, timeout=5):
+        self.open_react_select(container_locator, timeout)
+
+        input_element = self.find_is_visible_no_scroll(input_locator, timeout)
+        input_element.send_keys(value)
+
+        option_locator = (
+            By.XPATH,
+            f"//div[@role='option' and normalize-space()='{value}']"
+        )
+        self.find_is_clickable(option_locator, timeout).click()
+        return value
+
+    def select_random_react_option(self, container_locator, input_locator, values, timeout=5):
+        value = random.choice(values)
+        return self.select_react_option(container_locator, input_locator, value, timeout)
+
+    def select_random_html_option(self, select_locator):
+        select = Select(self.find_is_visible(select_locator))
+        value = random.choice([option.text for option in select.options])
+        select.select_by_visible_text(value)
+        return value
+
+    def select_random_react_multi_options(self, container_locator, input_locator, values, timeout=5):
+        selected_values = random.sample(values, k=random.randint(1, min(2, len(values))))
+        for value in selected_values:
+            self.select_react_option(container_locator, input_locator, value, timeout)
+        return selected_values
+
+    def get_react_single_value(self, container_locator):
+        container = self.find_is_visible(container_locator)
+        return container.find_element(
+            By.XPATH,
+            ".//div[contains(@class, 'singleValue')]"
+        ).text
+
+    def get_react_multi_values(self, container_locator):
+        container = self.find_is_visible(container_locator)
+        values = container.find_elements(
+            By.XPATH,
+            ".//div[contains(@class, 'multiValue')]/div[1]"
+        )
+        return [value.text for value in values]
+
+    def fill_select_menu(self):
+        return {
+            "select_value": self.select_random_react_option(
+                self.locators.SELECT_VALUE,
+                self.locators.SELECT_VALUE_INPUT,
+                self.SELECT_VALUE_OPTIONS
+            ),
+            "select_one": self.select_random_react_option(
+                self.locators.SELECT_ONE,
+                self.locators.SELECT_ONE_INPUT,
+                self.SELECT_ONE_OPTIONS
+            ),
+            "old_style": self.select_random_html_option(
+                self.locators.OLD_STYLE_SELECT_INPUT
+            ),
+            "multi_select": self.select_random_react_multi_options(
+                self.locators.MULTISELECT_DROP_DOWN,
+                self.locators.MULTISELECT_DROP_DOWN_INPUT,
+                self.MULTISELECT_OPTIONS
+            ),
+            "standard_select": self.select_random_html_option(
+                self.locators.STANDARD_MUTISELECT_INPUT
+            )
+        }
+
+    def get_select_menu_result(self):
+        old_style_select = Select(self.find_is_visible(self.locators.OLD_STYLE_SELECT_INPUT))
+        standard_select = Select(self.find_is_visible(self.locators.STANDARD_MUTISELECT_INPUT))
+
+        return {
+            "select_value": self.get_react_single_value(self.locators.SELECT_VALUE),
+            "select_one": self.get_react_single_value(self.locators.SELECT_ONE),
+            "old_style": old_style_select.first_selected_option.text,
+            "multi_select": self.get_react_multi_values(self.locators.MULTISELECT_DROP_DOWN),
+            "standard_select": standard_select.first_selected_option.text
+        }

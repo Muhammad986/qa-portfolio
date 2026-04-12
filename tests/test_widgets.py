@@ -1,6 +1,6 @@
 
 import time
-from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage, MenuPage, ProgressBarPage, SliderPage, TabsPage, ToolTipsPage
+from pages.widgets_page import AccordianPage, AutoCompletePage, DatePickerPage, MenuPage, ProgressBarPage, SelectMenuPage, SliderPage, TabsPage, ToolTipsPage
 
 
 class TestWidgets:
@@ -103,3 +103,16 @@ class TestWidgets:
             data = menu_page.check_menu()
 
             assert data == ['Main Item 1', 'Main Item 2', 'Sub Item', 'Sub Item', 'SUB SUB LIST »', 'Sub Sub Item 1', 'Sub Sub Item 2', 'Main Item 3'], 'Menu item do not exist or have not been selected'
+
+    class TestSelectMenu:
+        def test_select_menu(self, driver):
+            select_menu_page = SelectMenuPage(driver, 'https://demoqa.com/select-menu')
+            select_menu_page.open()
+
+            expected_result = select_menu_page.fill_select_menu()
+            actual_result = select_menu_page.get_select_menu_result()
+            print(actual_result)
+
+            assert expected_result == actual_result
+
+

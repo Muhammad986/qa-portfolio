@@ -62,3 +62,22 @@ class ToolTipsPageLocators:
 
 class MenuPageLocators:
     MENU_ITEM_LIST = (By.CSS_SELECTOR, 'ul[id="nav"] li a')
+
+
+class SelectMenuPageLocators:
+    SELECT_VALUE = (By.CSS_SELECTOR, 'div[id="withOptGroup"]')
+    SELECT_VALUE_INPUT = (By.CSS_SELECTOR, 'input[id="react-select-2-input"]')
+
+    SELECT_ONE = (By.CSS_SELECTOR, 'div[id="selectOne"]')
+    SELECT_ONE_INPUT = (By.CSS_SELECTOR, 'input[id="react-select-3-input"]')
+
+    OLD_STYLE_SELECT_INPUT = (By.CSS_SELECTOR, 'select[id="oldSelectMenu"]')
+
+    MULTISELECT_DROP_DOWN = (
+        By.XPATH,
+        "//div[contains(@class, 'css-b62m3t-container')][.//input[@id='react-select-4-input']]"
+    )
+    MULTISELECT_DROP_DOWN_INPUT = (By.CSS_SELECTOR, 'input[id="react-select-4-input"]')
+
+    STANDARD_MUTISELECT_INPUT = (By.CSS_SELECTOR, 'select[id="cars"]')
+
