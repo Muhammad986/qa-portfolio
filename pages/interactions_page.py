@@ -4,7 +4,7 @@ from selenium.common import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait as wait
 
 from pages.base_page import BasePage
-from locators.interactions_page_locators import SortablePageLocators
+from locators.interactions_page_locators import SelectablePageLocators, SortablePageLocators
 
 
 class SortablePage(BasePage):
@@ -64,3 +64,24 @@ class SortablePage(BasePage):
 
     def change_grid_order(self):
         return self.change_order(self.locators.TAB_GRID, self.locators.GRID_ITEM)
+
+class SelectablePage(BasePage):
+    locators = SelectablePageLocators()
+
+    def click_selectable_item(self, elements):
+        item_list = self.find_are_visible(elements)
+        if len(item_list) >= 1:
+            for item in random.sample(item_list, k=(random.randint(1, len(item_list)))):
+                item.click()
+
+    def select_active_item(self, tab_locator, items_locator, active_items_locator):
+        self.find_is_visible_no_scroll(tab_locator).click()
+        self.click_selectable_item(items_locator)
+        active_elements = self.find_are_visible(active_items_locator)
+        return [el.text for el in active_elements]
+
+    def select_list_item(self):
+        return self.select_active_item(self.locators.TAB_LIST, self.locators.LIST_ITEM, self.locators.LIST_ITEM_ACTIVE)
+    
+    def select_grid_item(self):
+        return self.select_active_item(self.locators.TAB_GRID, self.locators.GRID_ITEM, self.locators.GRID_ITEM_ACTIVE)
