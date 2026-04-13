@@ -44,8 +44,11 @@ class BasePage:
         ActionChains(self.driver).context_click(element).perform()
 
     def action_drag_and_drop(self, element, x_coordinate, y_coordinate):
-        action = ActionChains(self.driver)
-        action.drag_and_drop_by_offset(element, x_coordinate, y_coordinate).perform()
+        ActionChains(self.driver) \
+            .click_and_hold(element) \
+            .move_by_offset(x_coordinate, y_coordinate) \
+            .release() \
+            .perform()
 
     def action_drag_and_drop_to_element(self, what, where, hold_pause=0.2, move_pause=0.2):
         self.go_to_element(what)
@@ -59,7 +62,15 @@ class BasePage:
         action.pause(move_pause)
         action.release(where)
         action.perform()
+        
+    def scroll_to_page_bottom(self, timeout=5):
+        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
+        wait(self.driver, timeout).until(
+            lambda d: d.execute_script(
+                "return Math.ceil(window.innerHeight + window.pageYOffset) >= document.body.scrollHeight"
+            )
+        )
 
 
     def action_move_to_element(self, element):

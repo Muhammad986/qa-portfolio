@@ -1,10 +1,11 @@
 import random
+import time
 
 from selenium.common import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait as wait
 
 from pages.base_page import BasePage
-from locators.interactions_page_locators import SelectablePageLocators, SortablePageLocators
+from locators.interactions_page_locators import ResizablePageLocators, SelectablePageLocators, SortablePageLocators
 
 
 class SortablePage(BasePage):
@@ -85,3 +86,37 @@ class SelectablePage(BasePage):
     
     def select_grid_item(self):
         return self.select_active_item(self.locators.TAB_GRID, self.locators.GRID_ITEM, self.locators.GRID_ITEM_ACTIVE)
+    
+class ResizablePage(BasePage):
+    locators = ResizablePageLocators()
+
+    def get_px_width_height(self, value_of_size):
+        width = value_of_size.split(';')[0].split(':')[1].replace(' ', '')
+        height = value_of_size.split(';')[1].split(':')[1].replace(' ', '')
+        return width, height
+    
+    def get_max_min_size(self, element):
+        size = self.find_is_present(element)
+        size_value = size.get_attribute('style')
+        return size_value
+    
+    def change_size_resizable_box(self):
+        self.action_drag_and_drop(self.find_is_present(self.locators.RESIZABLE_BOX_HANDLE), 400, 200)
+        max_size = self.get_px_width_height(self.get_max_min_size(self.locators.RESIZABLE_BOX))
+        self.action_drag_and_drop(self.find_is_present(self.locators.RESIZABLE_BOX_HANDLE), -400, -300)
+        min_size = self.get_px_width_height(self.get_max_min_size(self.locators.RESIZABLE_BOX))
+
+        return max_size, min_size
+
+
+    def change_size_resizable(self):
+        self.scroll_to_page_bottom()
+
+        handle = self.find_is_present(self.locators.RESIZABLE_HANDLE)
+        self.action_drag_and_drop(handle, random.randint(1, 100), random.randint(1, 100))
+        max_size = self.get_px_width_height(self.get_max_min_size(self.locators.RESIZABLE))
+
+        self.action_drag_and_drop(handle, random.randint(-100, -1), random.randint(-100, -1))
+        min_size = self.get_px_width_height(self.get_max_min_size(self.locators.RESIZABLE))
+
+        return max_size, min_size
