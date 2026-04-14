@@ -5,7 +5,7 @@ from selenium.common import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait as wait
 
 from pages.base_page import BasePage
-from locators.interactions_page_locators import ResizablePageLocators, SelectablePageLocators, SortablePageLocators
+from locators.interactions_page_locators import DroppablePageLocators, ResizablePageLocators, SelectablePageLocators, SortablePageLocators
 
 
 class SortablePage(BasePage):
@@ -120,3 +120,126 @@ class ResizablePage(BasePage):
         min_size = self.get_px_width_height(self.get_max_min_size(self.locators.RESIZABLE))
 
         return max_size, min_size
+    
+class DroppablePage(BasePage):
+    locators = DroppablePageLocators()
+
+    def open_tab(self, tab_locator):
+        self.find_is_visible(tab_locator).click()
+
+    def get_text(self, locator, timeout=5):
+        return self.find_is_visible_no_scroll(locator, timeout).text.strip()
+
+    def wait_for_text(self, locator, expected_text, timeout=5):
+        wait(self.driver, timeout).until(
+            lambda driver: driver.find_element(*locator).text.strip() == expected_text
+        )
+        return self.get_text(locator, timeout)
+
+    def drag_to(self, drag_locator, drop_locator, timeout=5):
+        drag_element = self.find_is_visible_no_scroll(drag_locator, timeout)
+        drop_element = self.find_is_visible_no_scroll(drop_locator, timeout)
+        self.action_drag_and_drop_to_element(drag_element, drop_element)
+
+    def drag_and_wait_text(self, drag_locator, drop_locator, result_locator, expected_text='Dropped!', timeout=5, attempts=3):
+        for _ in range(attempts):
+            self.drag_to(drag_locator, drop_locator, timeout)
+            try:
+                return self.wait_for_text(result_locator, expected_text, timeout)
+            except TimeoutException:
+                continue
+        return self.get_text(result_locator, timeout)
+
+    def get_position(self, locator, timeout=5):
+        element = self.find_is_visible_no_scroll(locator, timeout)
+        location = element.location
+        return location["x"], location["y"]
+
+    def drag_and_get_positions(self, drag_locator, drop_locator, timeout=5):
+        position_before = self.get_position(drag_locator, timeout)
+        self.drag_to(drag_locator, drop_locator, timeout)
+        position_after_move = self.get_position(drag_locator, timeout)
+        return position_before, position_after_move
+
+    def wait_until_reverted(self, locator, start_position, timeout=5):
+        wait(self.driver, timeout).until(
+            lambda driver: self.get_position(locator, timeout) == start_position
+        )
+        return self.get_position(locator, timeout)
+
+    def drop_simple(self):
+        self.open_tab(self.locators.SIMPLE_TAB)
+        return self.drag_and_wait_text(
+            self.locators.DRAG_ME_SIMPLE,
+            self.locators.DROP_HERE_SIMPLE,
+            self.locators.DROP_HERE_SIMPLE
+        )
+
+    def drop_accept(self):
+        self.open_tab(self.locators.ACCEPT_TAB)
+
+        self.drag_to(self.locators.NOT_ACCEPTABLE, self.locators.DROP_HERE_ACCEPT)
+        result_no_accept = self.get_text(self.locators.DROP_HERE_ACCEPT)
+
+        result_accept = self.drag_and_wait_text(
+            self.locators.ACCEPTABLE,
+            self.locators.DROP_HERE_ACCEPT,
+            self.locators.DROP_HERE_ACCEPT
+        )
+
+        return result_no_accept, result_accept
+
+    def drop_prevent_propogation(self):
+        self.open_tab(self.locators.PREVENT_TAB)
+
+        text_not_greedy_inner_box = self.drag_and_wait_text(
+            self.locators.DRAG_ME_PREVENT,
+            self.locators.NOT_GREEDY_INNER_BOX,
+            self.locators.NOT_GREEDY_INNER_BOX
+        )
+        text_not_greedy_box = self.wait_for_text(
+            self.locators.NOT_GREEDY_DROP_BOX_TEXT,
+            'Dropped!'
+        )
+
+        text_greedy_inner_box = self.drag_and_wait_text(
+            self.locators.DRAG_ME_PREVENT,
+            self.locators.GREEDY_INNER_BOX,
+            self.locators.GREEDY_INNER_BOX
+        )
+        text_greedy_drop_box = self.get_text(self.locators.GREEDY_DROP_BOX_TEXT)
+
+        return (
+            text_not_greedy_box,
+            text_not_greedy_inner_box,
+            text_greedy_drop_box,
+            text_greedy_inner_box
+        )
+
+    def drop_revert_draggable(self, type_drag, timeout=5):
+        drags = {
+            'will': self.locators.WILL_REVERT,
+            'not_will': self.locators.NOT_REVERT
+        }
+
+        self.open_tab(self.locators.REVERT_TAB)
+
+        drag_locator = drags[type_drag]
+        drop_locator = self.locators.DROP_HERE_REVERT
+
+        position_before, position_after_move = self.drag_and_get_positions(
+            drag_locator,
+            drop_locator,
+            timeout
+        )
+
+        if type_drag == 'will':
+            position_after_revert = self.wait_until_reverted(
+                drag_locator,
+                position_before,
+                timeout
+            )
+        else:
+            position_after_revert = self.get_position(drag_locator, timeout)
+
+        return position_after_move, position_after_revert
