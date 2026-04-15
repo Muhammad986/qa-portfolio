@@ -44,11 +44,16 @@ class BasePage:
         ActionChains(self.driver).context_click(element).perform()
 
     def action_drag_and_drop(self, element, x_coordinate, y_coordinate):
+        self.go_to_element(element)
         ActionChains(self.driver) \
+            .move_to_element(element) \
             .click_and_hold(element) \
+            .pause(0.2) \
             .move_by_offset(x_coordinate, y_coordinate) \
+            .pause(0.2) \
             .release() \
             .perform()
+    
 
     def action_drag_and_drop_to_element(self, what, where, hold_pause=0.2, move_pause=0.2):
         self.go_to_element(what)

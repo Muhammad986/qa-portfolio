@@ -3,9 +3,11 @@ import time
 
 from selenium.common import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait as wait
+from selenium.common.exceptions import MoveTargetOutOfBoundsException
+
 
 from pages.base_page import BasePage
-from locators.interactions_page_locators import DroppablePageLocators, ResizablePageLocators, SelectablePageLocators, SortablePageLocators
+from locators.interactions_page_locators import DraggablePageLocators, DroppablePageLocators, ResizablePageLocators, SelectablePageLocators, SortablePageLocators
 
 
 class SortablePage(BasePage):
@@ -243,3 +245,116 @@ class DroppablePage(BasePage):
             position_after_revert = self.get_position(drag_locator, timeout)
 
         return position_after_move, position_after_revert
+
+class DraggablePage(BasePage):
+    locators = DraggablePageLocators()
+
+    def get_position(self, locator, timeout=5):
+        element = self.find_is_visible(locator, timeout)
+        location = element.location
+        return location["x"], location["y"]
+
+    def wait_until_position_changed(self, locator, old_position, timeout=5):
+        def position_changed(driver):
+            element = driver.find_element(*locator)
+            new_position = (element.location["x"], element.location["y"])
+            return new_position if new_position != old_position else False
+
+        return wait(self.driver, timeout).until(position_changed)
+
+    def get_random_offset(self, drag_element, container_locator=None):
+        if container_locator:
+            container = self.find_is_visible(container_locator)
+            drag_size = drag_element.size
+            drag_location = drag_element.location
+            container_size = container.size
+            container_location = container.location
+
+            current_x = drag_location["x"] - container_location["x"]
+            current_y = drag_location["y"] - container_location["y"]
+
+            min_x = max(-current_x, -100)
+            max_x = min(container_size["width"] - drag_size["width"] - current_x, 100)
+            min_y = max(-current_y, -100)
+            max_y = min(container_size["height"] - drag_size["height"] - current_y, 100)
+        else:
+            viewport_width = self.driver.execute_script("return window.innerWidth")
+            viewport_height = self.driver.execute_script("return window.innerHeight")
+
+            rect = self.driver.execute_script("""
+                const r = arguments[0].getBoundingClientRect();
+                return {
+                    left: r.left,
+                    top: r.top,
+                    width: r.width,
+                    height: r.height
+                };
+            """, drag_element)
+
+            center_x = rect["left"] + rect["width"] / 2
+            center_y = rect["top"] + rect["height"] / 2
+            safety = 10
+
+            min_x = max(int(-center_x + safety), -150)
+            max_x = min(int(viewport_width - center_x - safety), 150)
+            min_y = max(int(-center_y + safety), -150)
+            max_y = min(int(viewport_height - center_y - safety), 150)
+
+        while True:
+            x_offset = random.randint(min_x, max_x) if min_x != max_x else min_x
+            y_offset = random.randint(min_y, max_y) if min_y != max_y else min_y
+
+            if x_offset != 0 or y_offset != 0:
+                return x_offset, y_offset
+
+    def get_before_and_after_position(self, drag_locator, container_locator=None, timeout=5):
+        for _ in range(3):
+            drag_element = self.find_is_visible(drag_locator, timeout)
+            before_position = self.get_position(drag_locator, timeout)
+
+            x_offset, y_offset = self.get_random_offset(drag_element, container_locator)
+
+            try:
+                self.action_drag_and_drop(drag_element, x_offset, y_offset)
+                after_position = self.wait_until_position_changed(drag_locator, before_position, timeout)
+                return before_position, after_position
+            except (TimeoutException, MoveTargetOutOfBoundsException):
+                continue
+
+        return before_position, self.get_position(drag_locator, timeout)
+
+    def simple_drag_box(self):
+        self.find_is_visible(self.locators.SIMPLE_TAB).click()
+        return self.get_before_and_after_position(self.locators.DRAG_ME)
+
+    def axis_restricted_box(self, loc):
+        loc_X_and_Y = {
+            'x': self.locators.ONLY_X,
+            'y': self.locators.ONLY_Y
+        }
+        self.find_is_visible(self.locators.AXIC_RESTRICTED_TAB).click()
+        if loc == 'x':
+            before, after = self.get_before_and_after_position(loc_X_and_Y[loc])
+            return before[0], after[0]
+        else:
+            before, after = self.get_before_and_after_position(loc_X_and_Y[loc])
+            return before[1], after[1]
+        
+
+    def container_restricted(self, container):
+        parent_and_box_locator = {
+            'box': {
+                'drag': self.locators.BOX_COMPONENT,
+                'contain': self.locators.BOX_CONTEINER
+            },
+            'parent': {
+                'drag': self.locators.PARENT_COMPONENT,
+                'contain': self.locators.PARENT_CONTAINER
+            }
+        }
+        self.find_is_visible(self.locators.CONTAINER_RESTRICTED_TAB).click()
+
+        return self.get_before_and_after_position(
+            parent_and_box_locator[container]['drag'],
+            parent_and_box_locator[container]['contain']
+        )

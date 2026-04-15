@@ -2,7 +2,7 @@
 
 import time
 
-from pages.interactions_page import DroppablePage, ResizablePage, SelectablePage, SortablePage
+from pages.interactions_page import DraggablePage, DroppablePage, ResizablePage, SelectablePage, SortablePage
 
 
 class TestInteractions:
@@ -66,3 +66,28 @@ class TestInteractions:
 
             assert will_after_move != will_after_revert, 'The element has not reverted'
             assert not_will_after_move == not_will_after_revert, 'The element has reverted'
+    
+    class TestDraggable:
+        def test_simple_draggable(self, driver):
+            dragabble_page = DraggablePage(driver, 'https://demoqa.com/dragabble')
+            dragabble_page.open()
+            before, after = dragabble_page.simple_drag_box()
+            print(before)
+            print(after)
+            assert before != after, 'The position of the box has not been changed.'
+
+        def test_axis_restricted_draggable(self, driver):
+            dragabble_page = DraggablePage(driver, 'https://demoqa.com/dragabble')
+            dragabble_page.open()
+            before_x, after_x = dragabble_page.axis_restricted_box('x')
+            before_y, after_y = dragabble_page.axis_restricted_box('y')
+            assert before_x != after_x, 'The position of the box has not been changed.'
+            assert before_y != after_y, 'The position of the box has not been changed.'
+
+        def test_container_restricred_draggable(self, driver):
+            dragabble_page = DraggablePage(driver, 'https://demoqa.com/dragabble')
+            dragabble_page.open()
+            before_box, after_box = dragabble_page.container_restricted('box')
+            before_parent, after_parent = dragabble_page.container_restricted('parent')
+            assert before_box != after_box, 'The position of the box has not been changed.'
+            assert before_parent != after_parent, 'The position of the box has not been changed.'
