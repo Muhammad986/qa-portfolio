@@ -19,3 +19,16 @@ pip install -r requirements.txt
 ```bash
 pip freeze > requirements.txt
 ```
+
+
+## Запуск всех тестов через ``Allure``:
+
+```bash
+pytest --alluredir=tests/allure_results tests/
+```
+
+Просмотр резульатов теста:
+
+```bash
+allure serve tests/allure_results/
+```

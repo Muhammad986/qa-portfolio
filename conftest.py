@@ -1,4 +1,6 @@
+from datetime import datetime
 import os
+import allure
 import pytest
 from selenium import webdriver
 
@@ -18,4 +20,6 @@ def driver():
     driver = webdriver.Chrome(options=options)
     driver.maximize_window()
     yield driver
+    attach = driver.get_screenshot_as_png()
+    allure.attach(attach, name=f"screenshot {datetime.today()}", attachment_type=allure.attachment_type.PNG)
     driver.quit()

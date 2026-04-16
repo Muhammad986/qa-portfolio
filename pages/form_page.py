@@ -1,5 +1,6 @@
 import os
 
+import allure
 from selenium.webdriver.common.keys import Keys
 from generator.generator import generate_random_date, generated_file, generated_person, generated_subject
 from pages.base_page import BasePage
@@ -8,6 +9,7 @@ from locators.form_page_locators import FormPageLocators
 class FormPage(BasePage):
     locators = FormPageLocators()
 
+    @allure.step('Fill in the form fields')
     def  fill_form_fields(self):
         person = next(generated_person())
         _, path = generated_file()
@@ -33,7 +35,8 @@ class FormPage(BasePage):
         self.find_is_visible(self.locators.SELECT_CITY_INPUT).send_keys(Keys.ENTER)
         self.find_is_visible(self.locators.SUBMIT_BUTTON).click()
         return person
-
+    
+    @allure.step('Get form result')
     def form_result(self):
         result_list = self.find_are_present(self.locators.TABLE_RESULT)
         data =[]

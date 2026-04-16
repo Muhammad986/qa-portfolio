@@ -31,7 +31,7 @@ class DroppablePageLocators:
     ACCEPT_TAB = (By.CSS_SELECTOR, 'button[id="droppableExample-tab-accept"]')
     ACCEPTABLE = (By.CSS_SELECTOR, 'div[id="acceptable"]')
     NOT_ACCEPTABLE = (By.XPATH, '//*[@id="acceptDropContainer"]//div[contains(@class, "ui-draggable")][2]')
-    DROP_HERE_ACCEPT = (By.CSS_SELECTOR, '#acceptDropContainer div[class="drop-box ui-droppable"]')
+    DROP_HERE_ACCEPT = (By.CSS_SELECTOR, '#acceptDropContainer div.ui-droppable')
 
     # Prevent Propogation
     PREVENT_TAB = (By.CSS_SELECTOR, 'button[id="droppableExample-tab-preventPropogation"]')
